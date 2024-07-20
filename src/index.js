@@ -3,7 +3,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const routes = require("./routes");
+//const cors = require("cors");
 
+//app.use(cors());
 app.use(express.json());
 app.use("/api", routes);
 
