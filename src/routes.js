@@ -1,65 +1,90 @@
 const express = require("express");
 const router = express.Router();
-const Item = require("./models");
+const mongoose = require("mongoose");
 
-// Create
-router.post("/items", async (req, res) => {
+// Define the movie schema
+const movieSchema = new mongoose.Schema(
+  {
+    title: String,
+    year: Number,
+    genres: [String],
+    cast: [String],
+    plot: String,
+  },
+  { collection: "movies" }
+); // Specify the collection name
+
+// Create the movie model
+const Movie = mongoose.model("Movie", movieSchema);
+
+// Create a new movie
+router.post("/movies", async (req, res) => {
   try {
-    const newItem = new Item(req.body);
-    await newItem.save();
-    res.status(201).send(newItem);
+    const newMovie = new Movie(req.body);
+    await newMovie.save();
+    res.status(201).send(newMovie);
   } catch (error) {
     res.status(400).send(error);
   }
 });
 
-// Read all
-router.get("/items", async (req, res) => {
+// Get all movies
+router.get("/movies", async (req, res) => {
   try {
-    const items = await Item.find();
-    res.status(200).send(items);
+    const movies = await Movie.find();
+    res.status(200).send(movies);
   } catch (error) {
     res.status(400).send(error);
   }
 });
 
-// Read one
-router.get("/items/:id", async (req, res) => {
+// Get the count of all movies
+router.get("/movies/count", async (req, res) => {
   try {
-    const item = await Item.findById(req.params.id);
-    if (!item) {
+    const count = await Movie.countDocuments();
+    res.status(200).send({ count });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// Get a single movie by ID
+router.get("/movies/:id", async (req, res) => {
+  try {
+    const movie = await Movie.findById(req.params.id);
+    if (!movie) {
       return res.status(404).send();
     }
-    res.status(200).send(item);
+    res.status(200).send(movie);
   } catch (error) {
     res.status(400).send(error);
   }
 });
 
-// Update
-router.patch("/items/:id", async (req, res) => {
+// Update a movie by ID
+router.patch("/movies/:id", async (req, res) => {
   try {
-    const item = await Item.findByIdAndUpdate(req.params.id, req.body, {
+    const movie = await Movie.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
-    if (!item) {
+    if (!movie) {
       return res.status(404).send();
     }
-    res.status(200).send(item);
+    res.status(200).send(movie);
   } catch (error) {
     res.status(400).send(error);
   }
 });
 
-// Delete
-router.delete("/items/:id", async (req, res) => {
+// Delete a movie by ID
+router.delete("/movies/:id", async (req, res) => {
   try {
-    const item = await Item.findByIdAndDelete(req.params.id);
-    if (!item) {
+    const movie = await Movie.findByIdAndDelete(req.params.id);
+    if (!movie) {
       return res.status(404).send();
     }
-    res.status(200).send(item);
+    res.status(200).send(movie);
   } catch (error) {
     res.status(400).send(error);
   }
